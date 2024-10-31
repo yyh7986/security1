@@ -2,7 +2,6 @@ package com.cos.security1.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -26,18 +25,14 @@ public class SecurityConfig {
 
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
-                        //user라는 url로 들어오면 인증이 필요하다
                         .requestMatchers("/user/**").authenticated()
-                        //manager로 들어오면 MANAGER 인증 또는 ADMIN 인증이 필요하다
-                        .requestMatchers("/manager/**").hasAnyRole("MANAGER", "ADMIN")
-                        //admin으로 들어오면 ADMIN 권한이 있는 사람만 들어올 수 있다
+                        .requestMatchers("/manager/**").hasAnyAuthority("ROLE_MANAGER", "ROLE_ADMIN")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        //나머지 url은 전부 권한을 허용한다
                         .anyRequest().permitAll());
 
         http.formLogin(form ->
                 form.loginPage("/loginForm")
-                .loginProcessingUrl("/login")
+                        .loginProcessingUrl("/login")
                         .defaultSuccessUrl("/")
         );
         return http.build();
